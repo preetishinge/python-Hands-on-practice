@@ -1,0 +1,90 @@
+import os
+
+# -----------------------------
+# 1. Check if 'data_input' folder exists; if not, create it.
+# -----------------------------
+def ensure_folder_exists(folder_name):
+    folder_path = os.path.join(os.getcwd(), folder_name)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        print(f"'{folder_name}' folder was not found, so it has been created.")
+    return folder_path
+
+
+# -----------------------------
+# 2. Read all .txt files from 'data_input'
+# 3. For each .txt file:
+#    a) Count lines and words
+#    b) Ignore lines starting with #
+#    c) Replace "temp" with "permanent"
+#    d) Save modified file into 'data_output' with same filename
+# 4. Create summary.txt inside 'data_output'
+# -----------------------------
+def process_txt_files(input_folder, output_folder):
+    txt_files = [f for f in os.listdir(input_folder) if f.endswith('.txt')]
+
+    if not txt_files:
+        print("No .txt files found in the 'data_input' folder.")
+        return
+
+    # For summary.txt
+    summary_lines = ["Filename\tLine Count\tWord Count"]
+
+    for filename in txt_files:
+        input_path = os.path.join(input_folder, filename)
+        output_path = os.path.join(output_folder, filename)
+
+        line_count = 0
+        word_count = 0
+        modified_lines = []
+
+        # --- Reading file and processing each line ---
+        with open(input_path, 'r', encoding='utf-8') as infile:
+            lines = infile.readlines()
+
+            for line in lines:
+                if line.strip().startswith('#'):
+                    continue  # b) Ignore comment lines
+
+                line_count += 1  # a) Count valid lines
+                word_count += len(line.split())  # a) Count words
+
+                # c) Replace "temp" with "permanent"
+                modified_line = line.replace('temp', 'permanent')
+                modified_lines.append(modified_line)
+
+        # d) Save modified version in 'data_output'
+        with open(output_path, 'w', encoding='utf-8') as outfile:
+            outfile.writelines(modified_lines)
+
+        # Add entry to summary
+        summary_lines.append(f"{filename}\t{line_count}\t{word_count}")
+
+        # Console output
+        print(f"File: {filename}")
+        print(f"  Non-comment Lines: {line_count}")
+        print(f"  Word Count: {word_count}")
+        print(f"  Saved modified version to: data_output/{filename}")
+        print("-" * 50)
+
+    # 4. Write summary.txt file
+    summary_path = os.path.join(output_folder, "summary.txt")
+    with open(summary_path, 'w', encoding='utf-8') as summary_file:
+        summary_file.write("\n".join(summary_lines))
+
+    print(f"✅ Summary saved to: data_output/summary.txt")
+
+
+# -----------------------------
+# Main Execution
+# -----------------------------
+if __name__ == "__main__":
+    # Step 1: Ensure input and output folders exist
+    input_dir = ensure_folder_exists("data_input")
+    output_dir = ensure_folder_exists("data_output")
+
+    # Step 2–4: Process the .txt files if input folder is not empty
+    if os.listdir(input_dir):
+        process_txt_files(input_dir, output_dir)
+    else:
+        print("Please add .txt files to the 'data_input' folder and rerun the script.")
