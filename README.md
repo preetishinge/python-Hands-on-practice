@@ -1,4 +1,4 @@
-# python-Hands-on practice
+# python-Hands-on-practice
 
 Q1: Import and Use os Module
 Task: Write a script to print the current working directory using the os module.
